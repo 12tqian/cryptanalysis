@@ -27,3 +27,7 @@ def arr(a):
     for i in range(WS):
             ret.append(get(a, i))
     return ret
+def compose(l, r):
+    return r + (l<<WS)
+def split(x):
+    return (x>>WS), (x<<WS)
