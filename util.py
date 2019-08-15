@@ -25,4 +25,4 @@ def arr(a):
 def compose(l, r):
     return r + (l<<WS)
 def split(x):
-    return (x>>WS), ((x<<WS)%(1<<WS))
+    return (x>>WS), ((x)%(1<<WS))
