@@ -24,10 +24,9 @@ def simon(block, keys, rounds):
 
     for r in range(rounds):
         w1,w2 = rf(w1,w2,keys[r])
-    print(w1, w2)
     return w1 << WS | w2
 
 if __name__ == "__main__":
-    keys = key_schedule(0x1111222233334444, 4, 0b11111010001001010110000111001101111101000100101011000011100110, 32)
+    keys = key_schedule(0x1111222233334444, 4, Z, ROUNDS)
     print(keys)
     print(hex(simon(0x41414141, keys, 32)))
