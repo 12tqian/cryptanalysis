@@ -16,7 +16,7 @@ def guess(pairs, bits, difference, rounds):
 			while r in bits:
 				key = 0
 				for b in bits[r]:
-					key |= ((1 & ((i >> (count//len(bits.keys()) * list(bits.keys()).index(r))) >> b)) << b)
+					key |= ((1 & ((i >> sum(len(bits[list(bits.keys())[j]]) for j in range(list(bits.keys()).index(r)))) >> bits[r].index(b))) << b)
 				keys[i][r] = key
 				l1, r1 = r1, f(r1) ^ l1 ^ key
 				l2, r2 = r2, f(r2) ^ l2 ^ key
@@ -26,4 +26,4 @@ def guess(pairs, bits, difference, rounds):
 	return keys[rcounters[max(rcounters.keys())]]
 
 if __name__ == "__main__":
-	print(guess([(0, 0)], {17: (0,), 16: (1,), 15: (0,)}, 0, 18))
+	print(guess([(0, 0)], {17: (1,), 16: (0, 1), 15: (1,)}, 0, 18))
