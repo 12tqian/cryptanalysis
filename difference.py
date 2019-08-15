@@ -1,6 +1,5 @@
-WS = 16
-ROT = [1, 8, 2]
-ROUNDS = 128
+from random import shuffle
+from util import *
 chain = [-1 for i in range(ROUNDS)]
 prob = -1
 
@@ -34,6 +33,7 @@ def weight(l, r):
             fin[i] = res[i]
     return fin, cnt
 def threshold_reached(level, probability):
+#return False
     if(probability/(level+1) <=  5):
         return False
     return True
@@ -53,7 +53,14 @@ def dfs(l, r, tot, depth):
     nxt, num = weight(l, r)
    # print(num, "AASDA")
     #print(l, r)
-    for mask in range(0, 2**num):
+    #print(num)
+    trials = []
+    for i in range(2**num):
+        trials.append(i)
+    shuffle(trials)
+    #print(nxt)
+    for mask in trials:
+    #for mask in range(0, 2**num):
         cur = 0
         in_use = [-1 for x in range(WS+1)]
         use = [0 for x in range(WS)]
@@ -70,12 +77,14 @@ def dfs(l, r, tot, depth):
                     use[i] = in_use[-nxt[i]]
                 else:
                     use[i] = in_use[-nxt[i]]
-        print(nxt)
+        #print(nxt)
        # print(use)
         if(convert(use) ==0):
             continue
         translate = convert(use)
+       # print(arr(mask), nxt, arr(translate))
         chain[depth] = translate
+        assert(translate != -1)
         #print(l, r, translate, l, mask)
         if(dfs(translate, l, tot + num, depth+ 1)):
             return True
@@ -85,7 +94,7 @@ def dfs(l, r, tot, depth):
 
     
     
-dfs(542, 112, 0, 0)
+print(dfs(542, 112, 0, 0))
 print(chain)
 print(prob)
 
