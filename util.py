@@ -1,6 +1,7 @@
 WS = 16
+Z = 0b11111010001001010110000111001101111101000100101011000011100110
 ROT = [1, 8, 2]
-ROUNDS = 128
+ROUNDS = 32
 def rotl(n, d): 
     # rotate n by d to the left
     # In n<<d, last d bits are 0. 

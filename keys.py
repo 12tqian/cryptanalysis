@@ -17,4 +17,4 @@ def crack(z, r, k1, k2, k3, k4):
 	return list(reversed(keys))
 
 if __name__ == "__main__":
-	print(crack(0b11111010001001010110000111001101111101000100101011000011100110, 32, k1=54067, k2=52734, k3=50331, k4=34734))
+	print(crack(Z, ROUNDS, k1=54067, k2=52734, k3=50331, k4=34734))
