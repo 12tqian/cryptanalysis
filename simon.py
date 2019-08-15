@@ -24,7 +24,6 @@ def rol(n, rotations=1, width=WS):
     return ((n << rotations)%(1 << width)) | (n >> (width - rotations))
 
 def key_schedule(k, m, z, r):
-    c = 2**WS - 4
     size = WS * m
     keys = [(k >> (WS*(i)))&(2**WS-1) if i < m else None for i in range(r)]
     for i in range(m, r):
@@ -47,5 +46,7 @@ def simon(block, keys, rounds):
 
     return w1 << WS | w2
 
-keys = key_schedule(0x1111222233334444, 4, 0b11111010001001010110000111001101111101000100101011000011100110, 32)
-print(hex(simon(0x41414141, keys, 32)))
+if __name__ == "__main__":
+    keys = key_schedule(0x1111222233334444, 4, 0b11111010001001010110000111001101111101000100101011000011100110, 32)
+    print(keys)
+    print(hex(simon(0x41414141, keys, 32)))
