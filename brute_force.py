@@ -14,8 +14,8 @@ def transform(x, mask, length, key):
 def verify(key_list):
     full = crack(Z, ROUNDS, key_list[0], key_list[1], key_list[2], key_list[3])
     for case in test:
-        encrypted = simon(case, full, ROUNDS)
-        if encrypted != simon(case, ROUNDS):
+        encrypted = simon(case[0], full, ROUNDS)
+        if encrypted != case[1]:
             return False
     return True
         
@@ -32,19 +32,23 @@ def brute_force(candidates):
                     lengths[cnt] += 1
                 else:
                     val += i[j]*(1<<j)
-            num.eappend(val)
+            num.append(val)
             cnt += 1
-        #hopefully it's length 4
-        for m1 in range(2**lengths[0]):
-            for m2 in range(2**lengths[1]):
-                for m3 in range(2**lengths[2]):
-                    for m4 in range(2**lengths[3]):
-                        masks = [m1, m2, m3, m4]
-                        key_list = []
-                        for i in range(4):
-                            key_list.append(transform(num[i], masks[i], lengths[i], candidate[i]))
-                        if(verify(key_list)):
-                            return key_list
+
+        #Check all possibilities
+        for mask in range(2**sum(lengths)):
+            masks = []
+
+            #Splice out the correct bits from mask
+            for r in range(len(lengths)):
+                masks.append(mask%(2**length[r]))
+                mask = mask >> length[r]
+
+            key_list = []
+            for i in range(len(lengths))
+                key_list.append(transform(num[i], masks[i], lengths[i], candidate[i]))
+            if(verify(key_list)):
+                return key_list
         return []
                         
         

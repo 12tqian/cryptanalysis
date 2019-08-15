@@ -8,7 +8,7 @@ def guess(pairs, bits, difference, rounds):
 		counters[i] = 0
 		keys[i] = {}
 		for p in pairs:
-			l1 = p[0] >> WS
+			l1 = p[0] >> WS         #Change to compose
 			l2 = p[1] >> WS
 			r1 = p[0] % (1 << WS)
 			r2 = p[1] % (1 << WS)
