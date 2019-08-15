@@ -42,7 +42,7 @@ def weight(l, r):
             fin[i] = res[i]
     return fin, cnt
 def threshold_reached(level, probability):
-    if(probability/(level+1) <=  5):
+    if(probability/(level+1) <=  4):
         return False
     return True
 
@@ -51,6 +51,11 @@ def convert(a):
     ret = 0
     for i in range(WS):
             ret += (2**i)*a[i]
+    return ret
+def arr(a):
+    ret = []
+    for i in range(WS):
+            ret.append(get(a, i))
     return ret
 def dfs(l, r, tot, depth):
     global time
@@ -70,6 +75,7 @@ def dfs(l, r, tot, depth):
    # print(num, "AASDA")
     #print(l, r)
     for mask in range(0, 2**num):
+        print(arr(mask))
         cur = 0
         in_use = [-1 for x in range(WS+1)]
         use = [0 for x in range(WS)]
@@ -86,7 +92,7 @@ def dfs(l, r, tot, depth):
                     use[i] = in_use[-nxt[i]]
                 else:
                     use[i] = in_use[-nxt[i]]
-        print(nxt)
+       # print(nxt)
        # print(use)
         if(convert(use) ==0):
             continue
@@ -104,5 +110,6 @@ def dfs(l, r, tot, depth):
 dfs(542, 112, 0, 0)
 print(chain)
 print(prob)
+print(convert(arr(7)))
 
 
