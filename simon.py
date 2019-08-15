@@ -2,7 +2,6 @@ from util import *
 """
 Simon cipher
 """
-WS = 16 #Word size
 
 
 def key_schedule(k, m, z, r):

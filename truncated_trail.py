@@ -1,6 +1,6 @@
-
-ws = 16
+from util import *
 lac = [[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]    #left  bits
+
 rac = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
 kib = []    #Which bits in the keys are important
 rounds = 4  #How many rounds do you trace
@@ -11,25 +11,25 @@ sr = 14 #start round (for display purposes)
 #2 is unknown
 
 for r in range(rounds):
-    kib.append([0 for x in range(ws)])
-    for b in range(ws):
+    kib.append([0 for x in range(WS)])
+    for b in range(WS):
         if(rac[-1][b] > 0):
-            kib[-1][(b+7)%ws] = 1
-            kib[-1][(b-7)%ws] = 1
+            kib[-1][(b+7)%WS] = 1
+            kib[-1][(b-7)%WS] = 1
     rac.append(lac[-1][:])
     lac.append(rac[-2][:])
-    for b in range(ws):
+    for b in range(WS):
         if rac[-1][b] == 1:
-            lac[-1][(b-1)%ws] = 2
-            lac[-1][(b-8)%ws] = 2
-            if lac[-1][(b-2)%ws] == 0:
-                lac[-1][(b-2)%ws] = 1
+            lac[-1][(b-1)%WS] = 2
+            lac[-1][(b-8)%WS] = 2
+            if lac[-1][(b-2)%WS] == 0:
+                lac[-1][(b-2)%WS] = 1
             else:
-                lac[-1][(b-2)%ws] = 2
+                lac[-1][(b-2)%WS] = 2
         elif rac[-1][b] == 2:
-            lac[-1][(b-1)%ws] = 2
-            lac[-1][(b-8)%ws] = 2
-            lac[-1][(b-2)%ws] = 2
+            lac[-1][(b-1)%WS] = 2
+            lac[-1][(b-8)%WS] = 2
+            lac[-1][(b-2)%WS] = 2
             
 #Display
 curr = sr

@@ -1,18 +1,9 @@
-WS = 16
-
-def ror(n, rotations=1, width=WS):
-    """Return a given number of bitwise right rotations of an integer n,
-       for a given bit field width.
-    """
-    rotations %= width
-    if rotations < 1:
-        return n
-    return (n >> rotations) | ((n << (width - rotations))%(1 << width))
+from util import * 
 
 def reverse(z, r, k1, k2, k3=None, k4=None):
 	zi = ((z >> ((61 - r) % 62)) & 1)
 	c = 2**WS - 4
-	key = zi ^ c ^ (lambda x: ror(x, 1) ^ x)(ror(k3 if k4 else k2 if k3 else k1 if k2 else None, 3) ^ (k1 if k4 else 0)) ^ (k4 if k4 else k3 if k3 else k2)
+	key = zi ^ c ^ (lambda x: rotr(x, 1) ^ x)(rotr(k3 if k4 else k2 if k3 else k1 if k2 else None, 3) ^ (k1 if k4 else 0)) ^ (k4 if k4 else k3 if k3 else k2)
 	return key
 
 def crack(z, r, k1, k2, k3, k4):
