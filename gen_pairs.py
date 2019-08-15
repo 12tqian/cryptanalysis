@@ -1,15 +1,8 @@
 WS = 16
 import random
-def rotl(n, d): 
-    # rotate n by d to the left
-    # In n<<d, last d bits are 0. 
-    # To put first 3 bits of n at  
-    # last, do bitwise or of n<<d 
-    # with n >>(INT_BITS - d)  
-    return (n << d)|(n >> (WS - d))
+from util import *
+from simon import *
 
-def rotr(n, d):
-    return (n >> d)|(n << (WS - d))
 def f(x):
     return ((rotl(x, 1)&rotl(x, 8))^rotl(x, 2))
 
@@ -18,11 +11,13 @@ def gen_pairs(start, end, amt):
     lstart = start >> WS
     rstart = start % (1<<WS)
 
+    pairs = []
     for i in range(amt):
         L_x = random.randint(0,2**WS)
         R_x = random.randint(0,2**WS)
         pairs.append([compose(L_x, R_x), compose(L_x^rstart, R_x^f(R_x)^lstart)])
 
+    print(pairs)
     #Keep only pairs that have correct ending
     final_pairs = []
     for x in pairs:
@@ -37,3 +32,6 @@ def gen_pairs(start, end, amt):
             final_pairs.append(x)
 
     return final_pairs
+
+if __name__ == "__main__":
+    print(gen_pairs(0x12345678, 0x87654321, 10))

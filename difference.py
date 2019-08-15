@@ -3,17 +3,9 @@ ROT = [1, 8, 2]
 ROUNDS = 128
 chain = [-1 for i in range(ROUNDS)]
 prob = -1
-def get(a, n):
-    return (a>>n)&1
 
+from util import *
 
-def rotl(n, d): 
-    # rotate n by d to the left
-    # In n<<d, last d bits are 0. 
-    # To put first 3 bits of n at  
-    # last, do bitwise or of n<<d 
-    # with n >>(INT_BITS - d)  
-    return (n << d)|(n >> (WS - d))
 def rotation_weight(a, r):
     #returns the difference thing
     #each difference formed by 2^(n-cnt) pairs
@@ -42,24 +34,11 @@ def weight(l, r):
             fin[i] = res[i]
     return fin, cnt
 def threshold_reached(level, probability):
-    if(probability/(level+1) <=  4):
+    if(probability/(level+1) <=  5):
         return False
     return True
 
-time = 0
-def convert(a):
-    ret = 0
-    for i in range(WS):
-            ret += (2**i)*a[i]
-    return ret
-def arr(a):
-    ret = []
-    for i in range(WS):
-            ret.append(get(a, i))
-    return ret
 def dfs(l, r, tot, depth):
-    global time
-    time += 1
     global prob
     prob = tot
     if(depth != ROUNDS and threshold_reached(depth, tot)):
@@ -75,7 +54,6 @@ def dfs(l, r, tot, depth):
    # print(num, "AASDA")
     #print(l, r)
     for mask in range(0, 2**num):
-        print(arr(mask))
         cur = 0
         in_use = [-1 for x in range(WS+1)]
         use = [0 for x in range(WS)]
@@ -92,7 +70,7 @@ def dfs(l, r, tot, depth):
                     use[i] = in_use[-nxt[i]]
                 else:
                     use[i] = in_use[-nxt[i]]
-       # print(nxt)
+        print(nxt)
        # print(use)
         if(convert(use) ==0):
             continue
@@ -110,6 +88,5 @@ def dfs(l, r, tot, depth):
 dfs(542, 112, 0, 0)
 print(chain)
 print(prob)
-print(convert(arr(7)))
 
 
