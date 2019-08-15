@@ -58,7 +58,7 @@ def dfs(l, r, tot, depth):
     for i in range(2**num):
         trials.append(i)
     shuffle(trials)
-    #print(nxt)
+    print(nxt)
     for mask in trials:
     #for mask in range(0, 2**num):
         cur = 0
