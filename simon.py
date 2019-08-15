@@ -26,6 +26,10 @@ def simon(block, keys, rounds):
         w1,w2 = rf(w1,w2,keys[r])
     return w1 << WS | w2
 
+def simon(block, key=MASTER_KEY):
+    keys = key_schedule(key, 4, Z, ROUNDS)
+    return simon(block, keys, ROUNDS)
+    
 if __name__ == "__main__":
     keys = key_schedule(0x1111222233334444, 4, Z, ROUNDS)
     print(keys)
