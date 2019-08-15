@@ -26,4 +26,4 @@ def guess(pairs, bits, difference, rounds):
 	return keys[rcounters[max(rcounters.keys())]]
 
 if __name__ == "__main__":
-	print(guess([(0, 0)], {17: (1,), 16: (0, 1), 15: (1,)}, 0, 18))
+	print(guess([(0, 0)], {17: (0, 1, 5, 7, 8, 9, 10, 11, 14, 15), 16: (6, 7, 8, 9, 13, 15), 15: (7, 9)}, 0, 18))
