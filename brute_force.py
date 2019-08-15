@@ -45,7 +45,7 @@ def brute_force(candidates):
                 mask = mask >> length[r]
 
             key_list = []
-            for i in range(len(lengths))
+            for i in range(len(lengths)):
                 key_list.append(transform(num[i], masks[i], lengths[i], candidate[i]))
             if(verify(key_list)):
                 return key_list
