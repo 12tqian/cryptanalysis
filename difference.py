@@ -34,7 +34,7 @@ def weight(l, r):
     return fin, cnt
 def threshold_reached(level, probability):
 #return False
-    if(probability/(level+1) <=  5):
+    if(probability/(level+1) <= 5):
         return False
     return True
 
@@ -59,8 +59,8 @@ def dfs(l, r, tot, depth):
         trials.append(i)
     shuffle(trials)
     print(nxt)
-    for mask in trials:
-    #for mask in range(0, 2**num):
+    #for mask in trials:
+    for mask in range(0, 2**num):
         cur = 0
         in_use = [-1 for x in range(WS+1)]
         use = [0 for x in range(WS)]
