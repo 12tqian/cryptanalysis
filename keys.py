@@ -7,12 +7,12 @@ def reverse(z, r, k1, k2, k3=None, k4=None):
 	return key
 
 def crack(z, r, k1, k2, k3=None, k4=None):
-	keys = [k4, k3, k2, k1]
+	keys = [k4, k3, k2, k1] if k4 else [k3, k2, k1] if k3 else [k2, k1]
 	r -= 4 if k4 else 3 if k3 else 2 if k2 else None
 	while r > 0:
 		r -= 1
 		k = reverse(z, r, k1, k2, k3, k4)
-		k1, k2, k3, k4 = k, k1, k2, k3
+		k1, k2, k3, k4 = k, k1, k2 if k3 else None, k3 if k4 else None
 		keys.append(k)
 	return list(reversed(keys))
 
