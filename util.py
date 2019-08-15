@@ -10,7 +10,8 @@ def rotl(n, d):
     return (n << d)|(n >> (WS - d))
 
 def rotr(n, d):
-    return (n >> d)|(n << (WS - d)); 
+    return (n >> d)|((n << (WS - d))%(1<<WS))
+
 def f(x):
     return ((rotl(x, 1)&rotl(x, 8))^rotl(x, 2))
 def get(a, n):
