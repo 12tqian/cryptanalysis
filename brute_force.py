@@ -14,8 +14,8 @@ def transform(x, mask, length, key):
 def verify(key_list):
     full = crack(Z, ROUNDS, key_list[0], key_list[1], key_list[2], key_list[3])
     for case in test:
-        encrypted = simon(case[0], full, ROUNDS)
-        if encrypted != case[1]:
+        encrypted = simon(case, full, ROUNDS)
+        if encrypted != simon(case, ROUNDS):
             return False
     return True
         
