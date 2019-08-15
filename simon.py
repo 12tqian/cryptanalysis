@@ -24,7 +24,7 @@ def simon(block, keys, rounds):
 
     for r in range(rounds):
         w1,w2 = rf(w1,w2,keys[r])
-
+    print(w1, w2)
     return w1 << WS | w2
 
 if __name__ == "__main__":

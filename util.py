@@ -3,12 +3,7 @@ Z = 0b11111010001001010110000111001101111101000100101011000011100110
 ROT = [1, 8, 2]
 ROUNDS = 32
 def rotl(n, d): 
-    # rotate n by d to the left
-    # In n<<d, last d bits are 0. 
-    # To put first 3 bits of n at  
-    # last, do bitwise or of n<<d 
-    # with n >>(INT_BITS - d)  
-    return (n << d)|(n >> (WS - d))
+    return ((n << d)%(1 << WS)) | (n >> (WS - d))
 
 def rotr(n, d):
     return (n >> d)|((n << (WS - d))%(1<<WS))
