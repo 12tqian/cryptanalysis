@@ -4,6 +4,9 @@ def guess(pairs, bits, difference, rounds):
 	counters = {}
 	keys = {}
 	count = sum(len(b) for b in bits.values())
+	blist = list(bits.keys())
+	jbits = [len(bits[blist[j]]) for j in range(len(blist))]
+	sums = [sum(jbits[j] for j in range(bindex)) for bindex in range(len(blist))]
 	for i in range(2**count):
 		counters[i] = 0
 		keys[i] = {}
@@ -14,9 +17,11 @@ def guess(pairs, bits, difference, rounds):
 			r2 = p[1] % (1 << WS)
 			r = rounds - 1
 			while r in bits:
+				bindex = blist.index(r)
+				br = bits[r]
 				key = 0
 				for b in bits[r]:
-					key |= ((1 & ((i >> sum(len(bits[list(bits.keys())[j]]) for j in range(list(bits.keys()).index(r)))) >> bits[r].index(b))) << b)
+					key |= ((1 & ((i >> sums[bindex]) >> br.index(b))) << b)
 				keys[i][r] = key
 				l1, r1 = r1, f(r1) ^ l1 ^ key
 				l2, r2 = r2, f(r2) ^ l2 ^ key
@@ -26,4 +31,4 @@ def guess(pairs, bits, difference, rounds):
 	return keys[rcounters[max(rcounters.keys())]]
 
 if __name__ == "__main__":
-	print(guess([(0, 0)], {17: (1,), 16: (0, 1), 15: (1,)}, 0, 18))
+	print(guess([(0, 0)], {17: (0, 1, 5, 7, 8, 9, 10, 11, 14, 15), 16: (6, 7, 8, 9, 13, 15), 15: (7, 9)}, 0, 18))
