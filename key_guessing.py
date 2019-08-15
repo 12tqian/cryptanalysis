@@ -21,9 +21,9 @@ def guess(pairs, bits, difference, rounds):
 				l1, r1 = r1, f(r1) ^ l1 ^ key
 				l2, r2 = r2, f(r2) ^ l2 ^ key
 				r -= 1
-			if ((l1 << WS) + r1) ^ ((l2 << WS) + r2) == difference: counters[i] += 1
+			if ((r1^r2) << WS) + (l1 ^ f(r1) ^ l2 ^ f(r2)) == difference: counters[i] += 1
 	rcounters = {v: k for k, v in counters.items()}
 	return keys[rcounters[max(rcounters.keys())]]
 
 if __name__ == "__main__":
-	print(guess([(0, 0)], {17: (0,), 16: (0,), 15: (0,)}, 0, 18))
+	print(guess([(0, 0)], {17: (0,), 16: (1,), 15: (0,)}, 0, 18))
