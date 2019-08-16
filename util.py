@@ -38,4 +38,4 @@ def split(x):
 def flip(x):
     return (1<<WS) - 1 - x
 def wt(x):
-    bin(x).count("1")
+    return bin(x).count("1")

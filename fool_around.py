@@ -1,14 +1,21 @@
 from util import *
-a = 1
-b = 8
-c = 2
 def p(alpha, beta):
-    vb = (rotl(alpha, a)|rotl(alpha, b))
-    db = ((rotl(alpha, b)|flip(rotl(alpha, a)))|rotl(alpha, 2*a - b))
-    gamma = (beta^(rotl(alpha, c)))
-    if a == 2**WS - 1 and wt(gamma)%2 == 0:
+    vb = (rotl(alpha, ROT[0])|rotl(alpha, ROT[1]))
+    db = ((rotl(alpha, ROT[1])&flip(rotl(alpha, ROT[0])))&rotl(alpha, 2*ROT[0] - ROT[1]))
+    gamma = (beta^(rotl(alpha, ROT[2])))
+    if alpha == 2**WS - 1 and wt(gamma)%2 == 0:
         return WS - 1
-    elif alpha != 2**WS - 1 and (gamma&flip(vb) == 0) and ((gamma^rotl(gamma, a-b))|db) == 0:
+    elif alpha != 2**WS - 1 and (gamma&flip(vb) == 0) and ((gamma^rotl(gamma, ROT[0] - ROT[1]))&db) == 0:
         return wt((vb^db))
     return -1
-print(p(5, 1))
+def getBeta(alpha):
+    v1 = 0
+    v2 = alpha
+    e1 = (f(v1))
+    e2 = (f(v2))
+    return (e1^e2)
+
+print(getBeta(23))
+print(p(23, getBeta(23)))
+print(flip(0))
+print(wt(flip(0)))
