@@ -18,17 +18,19 @@ def rf(w1,w2,key):
     """Round function"""
     return w2 ^ (rotl(w1,1) & rotl(w1,8))^ rotl(w1,2) ^ key, w1
 
-def simon(block, keys, rounds):
+def simon(block, keys=[], rounds=0):
+    if rounds == 0:
+        if not len(keys):
+            keys = key_schedule(MASTER_KEY, 4, Z, ROUNDS)
+
+        return simon(block, keys, ROUNDS)
     w1 = block >> WS
     w2 = block % (1<<WS)
 
     for r in range(rounds):
         w1,w2 = rf(w1,w2,keys[r])
     return w1 << WS | w2
-
-def simon(block, key=MASTER_KEY):
-    keys = key_schedule(key, 4, Z, ROUNDS)
-    return simon(block, keys, ROUNDS)
+    
     
 if __name__ == "__main__":
     keys = key_schedule(0x1111222233334444, 4, Z, ROUNDS)
