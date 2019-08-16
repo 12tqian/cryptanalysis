@@ -5,10 +5,16 @@ ROUNDS = 12
 
 MASTER_KEY = 0x1111222233334444
 
-def rotl(n, d): 
+def rotl(n, d):
+    d %= WS
+    if(d<0):
+        d += WS
     return ((n << d)%(1 << WS)) | (n >> (WS - d))
 
 def rotr(n, d):
+    d %= WS
+    if(d<0):
+        d+= WS
     return (n >> d)|((n << (WS - d))%(1<<WS))
 
 def f(x):
@@ -29,3 +35,7 @@ def compose(l, r):
     return r + (l<<WS)
 def split(x):
     return (x>>WS), ((x)%(1<<WS))
+def flip(x):
+    return (1<<WS) - 1 - x
+def wt(x):
+    bin(x).count("1")
