@@ -1,6 +1,6 @@
 from util import *
 st = []
-MX = 6
+MX = 18
 """def p(alpha, beta):
     print(MX)
     vb = (rotl(alpha, ROT[0], MX)|rotl(alpha, ROT[1], MX))
@@ -37,7 +37,13 @@ for i in range((1<<MX)):
     w = wt(i)
     if(prob(i) == -1):
         print(i)
-    #st[w].append(prob(i))
+    st[w].append(prob(i))
 for i in range(len(st)):
     st[i].sort()
-print(st)
+for i in range (len(st)):
+    if(1<= i and i<(float(MX))/2):
+        print(max(st[i]), i+1)
+    elif(float(MX)/2<= i and i<MX):
+        print(max(st[i]), i)
+    else:
+        print(max(st[i]), MX-1)
