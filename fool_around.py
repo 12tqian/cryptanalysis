@@ -16,6 +16,6 @@ def getBeta(alpha):
     return (e1^e2)
 
 print(getBeta(23))
-print(p(23, getBeta(23)))
+print(p(5, getBeta(5)))
 print(flip(0))
 print(wt(flip(0)))
