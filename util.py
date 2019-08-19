@@ -17,8 +17,8 @@ def rotr(n, d, SZ = WS):
         d+= SZ
     return (n >> d)|((n << (SZ - d))%(1<<SZ))
 
-def f(x):
-    return ((rotl(x, 1)&rotl(x, 8))^rotl(x, 2))
+def f(x, SZ = WS):
+    return ((rotl(x, 1, SZ)&rotl(x, 8, SZ))^rotl(x, 2, SZ))
 def get(a, n):
     return (a>>n)&1
 def convert(a, SZ = WS):
