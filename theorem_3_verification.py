@@ -23,8 +23,8 @@ def p(alpha, beta):
 def getBeta(alpha):
     v1 = 0
     v2 = alpha
-    e1 = (f(v1))
-    e2 = (f(v2))
+    e1 = (f(v1, SZ))
+    e2 = (f(v2, SZ))
     return (e1^e2)
 def prob(alpha):
     return p(alpha, getBeta(alpha))
