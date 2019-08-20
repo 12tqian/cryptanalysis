@@ -1,16 +1,7 @@
 from util import *
 st = []
-MX = 6
-"""def p(alpha, beta):
-    print(MX)
-    vb = (rotl(alpha, ROT[0], MX)|rotl(alpha, ROT[1], MX))
-    db = ((rotl(alpha, ROT[1], MX)&flip(rotl(alpha, ROT[0], MX), MX))&rotl(alpha, 2*ROT[0] - ROT[1], MX))
-    gamma = (beta^(rotl(alpha, ROT[2], MX)))
-    if alpha == 2**MX - 1 and wt(gamma)%2 == 0:
-        return MX - 1
-    elif alpha != 2**MX - 1 and (gamma&flip(vb, MX) == 0) and ((gamma^rotl(gamma, ROT[0] - ROT[1]))&db, MX) == 0:
-        return wt((vb^db))
-    return -1"""
+MX = 16
+
 def p(alpha, beta):
     vb = (rotl(alpha, ROT[0], MX)|rotl(alpha, ROT[1], MX))
     db = ((rotl(alpha, ROT[1], MX)&flip(rotl(alpha, ROT[0], MX), MX))&rotl(alpha, 2*ROT[0] - ROT[1], MX))
@@ -33,11 +24,17 @@ def prob(alpha):
 for i in range(MX+1):
     st.append([])
 
+
+
+def thm3(alpha):
+    w = wt(alpha)
+    if 1<=w and w<MX/2:
+        return w+1
+    elif w<MX:
+        return w
+    else:
+        return MX-1
+
 for i in range((1<<MX)):
     w = wt(i)
-    if(prob(i) == -1):
-        print(i)
-    #st[w].append(prob(i))
-for i in range(len(st)):
-    st[i].sort()
-print(st)
+    print(thm3(i),prob(i),w)
