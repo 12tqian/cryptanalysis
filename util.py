@@ -26,6 +26,9 @@ def convert(a, SZ = WS):
     for i in range(SZ):
             ret += (2**i)*a[i]
     return ret
+def convert2(a,SZ=WS):
+    """Converts a list into an int, with rightmost bit being least value"""
+    return convert(a[::-1], SZ)
 def arr(a, SZ = WS):
     ret = []
     for i in range(SZ):
