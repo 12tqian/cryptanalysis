@@ -19,14 +19,13 @@ def rf(w1,w2,key):
     return w2 ^ (rotl(w1,1) & rotl(w1,8))^ rotl(w1,2) ^ key, w1
 
 def simon(block, keys=[], rounds=0):
-    if rounds == 0:
-        if not len(keys):
+    if not len(keys):
             keys = key_schedule(MASTER_KEY, 4, Z, ROUNDS)
+    if rounds == 0:
 
         return simon(block, keys, ROUNDS)
     w1 = block >> WS
     w2 = block % (1<<WS)
-
     for r in range(rounds):
         w1,w2 = rf(w1,w2,keys[r])
     return w1 << WS | w2
