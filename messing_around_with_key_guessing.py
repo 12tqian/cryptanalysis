@@ -1,4 +1,5 @@
 from util import *
+from simon import *
 from random import randint
 
 #try to break 3 rounds
@@ -29,9 +30,9 @@ for guess in range(2**len(bits_to_guess)):
         k[bits_to_guess[biti]] = get(guess,biti)
 
     for pair in pairs:
-        out1 = simon(pairs[0],rounds=3)
+        out1 = simon(pair[0],rounds=3)
         outleft1, outright1 = split(out1)
-        out2 = simon(pairs[1],rounds=3)
+        out2 = simon(pair[1],rounds=3)
         outleft2, outright2 = split(out2)
 
         #check if the pair matches expected
@@ -53,6 +54,9 @@ for guess in range(2**len(bits_to_guess)):
         newleft2 = outright2
         newright2 = outleft2 ^ f(outright2) ^ k
         
-        if 
+        if enddiff[0] == newleft1 ^ newleft2 and enddiff[1] == newright1 ^ newright2:
+            d[guess]+=1
+
+print(d)
                     
                     
