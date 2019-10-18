@@ -24,16 +24,20 @@ enddiff = [convert2([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]),convert2([
 leftdiff = [2,0,2,2,2,0,2,0,2,2,2,2,2,2,1,2]#[0,2,2,0,0,0,0,2,2,0,2,2,1,0,2,0] #At round rounds, diff is this
 rightdiff = [0,2,2,0,0,0,0,2,2,0,2,2,1,0,2,0]#[2,0,0,0,0,0,1,0,0,2,1,0,0,0,0,0]
 
-NC = 100 #Number of pair candidates
+NC = 1000 #Number of pair candidates
 rounds = 5
 extra_rounds = 3
 
 
-keys = [rand_word() for x in range(rounds)]
+keys = [12570, 33730, 38026, 48474, 63835]#[rand_word() for x in range(rounds)]
 print("keys",keys)
 
 #Generate a bunch of pair candidates and filter them
 filtered = []
+e = {}
+wg = 0
+wb = 0
+badlist = []
 for count in range(NC):
     left1, right1 = rand_word(), rand_word()
     left2, right2 = left1^startdiff[0], right1^startdiff[1]
@@ -56,26 +60,34 @@ for count in range(NC):
         elif rightdiff[biti] == 1 and not(get(outright1,biti)!=get(outright2,biti)):
             works = False
 
+    #check if the pair followed the trail
+    out1 = simon(pair[0],keys,2)
+    outleft1, outright1 = split(out1)
+    out2 = simon(pair[1],keys,2)
+    outleft2, outright2 = split(out2)
+
+    works2 = enddiff[0] == outleft1 ^ outleft2 and enddiff[1] == outright1 ^ outright2
+            
     if works:
-        filtered.append(pair) #Pair has correct output
+        
+        e[str(pair)] = 0
+        if works2:
+            wg+=1
+            filtered.append(pair) #Pair has correct output #Move back to always
+        else:
+            wb+=1
+            badlist.append([outleft1 ^ outleft2,outright1 ^ outright2])
+        
 
 bits_to_guess = [[],[1,15],[0,1,2,3,7,9,13,15]] #Should have a length of extra_rounds
 print("filtered",len(filtered))
 d = {}
+
 tot = 0
-[0, 32770, 40971]
-[0, 2, 40971]
-for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))):
+
+for kguesses in [[0, 32770, 40971],[0, 2, 40971]]:
     
-    kguesses = []   #In order of increasing round numbers
     index = 0
-    for r in range(extra_rounds):
-        k = [0]*WS
-        for biti in range(len(bits_to_guess[r])):
-            k[bits_to_guess[r][biti]] = get(guess,index)
-            index+=1
-        k = convert(k)
-        kguesses.append(k)
     d[str(kguesses)] = 0
 
     for pair in filtered:
@@ -89,6 +101,11 @@ for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))):
         
         if enddiff[0] == left1 ^ left2 and enddiff[1] == right1 ^ right2:
             d[str(kguesses)]+=1
+            e[str(pair)] += 1 if kguesses[1]==2 else 2
+        else:
+            print(pair,kguesses)
+            input()
+            
 
 #print("d",d)
 m = -1
@@ -98,18 +115,13 @@ for x in d.keys():
         m = x
         mc = d[x]
 m = [int(x) for x in m[1:-1].split(", ")]
-belief = ""
 print("Believes that: ")
 for r in range(extra_rounds):
     ri = rounds-extra_rounds+r#Adjusted
     for biti in range(len(bits_to_guess[r])):
         print("Round",ri,"bit",bits_to_guess[r][biti],"is",get(m[r],bits_to_guess[r][biti]))
-        belief += str(get(m[r],bits_to_guess[r][biti]))
-answer = ""
 print("Answer: ")
 for r in range(extra_rounds):
     ri = rounds-extra_rounds+r
     for biti in range(len(bits_to_guess[r])):
         print("Round",ri,"bit",bits_to_guess[r][biti],"is",get(keys[ri],bits_to_guess[r][biti]))
-        answer += str(get(keys[ri],bits_to_guess[r][biti]))
-print(answer==belief)
