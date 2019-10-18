@@ -1,3 +1,4 @@
+#OLD VERSION. UNUSED
 from util import *
 
 def guess(pairs, bits, difference, rounds):

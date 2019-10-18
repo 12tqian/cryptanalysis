@@ -14,27 +14,32 @@ def backtrack(left1,right1,left2,right2,k):
     newright2 = left2 ^ f(right2) ^ k
     return newleft1, newright1, newleft2, newright2
 
-#try to break 6 rounds
+def color_match(diff, expected):
+    for biti in range(WS):
+        if expected[biti] in [0,1] and expected[biti] != get(diff,biti):
+            return False
+    return True
+
+#try to break 8 rounds
 #At round 1, diff is (0, d{6})
 startdiff = [0,convert2([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0])]
 
-#At round 3, diff is (d{8},d{6})
-enddiff = [convert2([0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]),convert2([0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0])]
+#At round 5, diff is (d{8},d{6})
+enddiff = [convert([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]),convert([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0])]
 
-leftdiff = [2,0,2,2,2,0,2,0,2,2,2,2,2,2,1,2]#[0,2,2,0,0,0,0,2,2,0,2,2,1,0,2,0] #At round rounds, diff is this
-rightdiff = [0,2,2,0,0,0,0,2,2,0,2,2,1,0,2,0]#[2,0,0,0,0,0,1,0,0,2,1,0,0,0,0,0]
+leftdiff = [2,2,1,2,2,0,2,2,2,2,2,0,2,2,2,2] #At rounds rounds, diff is this
+rightdiff = [2,2,0,2,2,0,0,1,2,2,2,0,0,2,0,1]
 
-NC = 100 #Number of pair candidates
-rounds = 6
+NC = 50 #Number of pair candidates
+rounds = 8 #Total rounds
 extra_rounds = 3
 
-
-keys = [rand_word() for x in range(rounds)]
+keys = [37161, 33453, 58802, 32979, 6005, 37057, 64280, 11622]#[rand_word() for x in range(rounds)]#
 print("keys",keys)
 
 #Generate a bunch of pair candidates and filter them
 filtered = []
-for count in range(NC):
+while len(filtered) < NC:
     left1, right1 = rand_word(), rand_word()
     left2, right2 = left1^startdiff[1], right1^f(left1^startdiff[1])^f(left1)^startdiff[0] #modified to extract an extra round.
     pair = [compose(left1,right1),compose(left2,right2)]
@@ -44,22 +49,11 @@ for count in range(NC):
     out2 = simon(pair[1],keys,rounds)
     outleft2, outright2 = split(out2)
 
-    #check if the pair matches expected
-    works = True
-    for biti in range(WS):
-        if leftdiff[biti] == 0 and not(get(outleft1,biti)==get(outleft2,biti)):
-            works = False
-        elif leftdiff[biti] == 1 and not(get(outleft1,biti)!=get(outleft2,biti)):
-            works = False
-        if rightdiff[biti] == 0 and not(get(outright1,biti)==get(outright2,biti)):
-            works = False
-        elif rightdiff[biti] == 1 and not(get(outright1,biti)!=get(outright2,biti)):
-            works = False
-
-    if works:
+    #check if the pair matches expected after rounds rounds
+    if color_match(outleft1^outleft2,leftdiff) and color_match(outright1^outright2,rightdiff):
         filtered.append(pair) #Pair has correct output
 
-bits_to_guess = [[],[1,15],[0,1,2,3,7,9,13,15]] #Should have a length of extra_rounds
+bits_to_guess = [[],[3,5],[1,3,4,5,6,7,11,13,15]] #Should have a length of extra_rounds, first list should be empty
 print("filtered",len(filtered))
 d = {}
 tot = 0
@@ -76,24 +70,30 @@ for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))):
             kr[bits_to_guess[r][biti]] = get(guess,index)
             index+=1
         k = convert(k)
-        kr = convert(kr)
         kguesses.append(k)
         krguesses.append(kr)
     d[str(kguesses)] = 0
+    #if(kguesses not in [[0, 8, 10274],[0, 8, 10290],[0, 8, 10338],[0, 8, 10354]]):
+    #    continue
+
 
     for pair in filtered:
+        for r in range(extra_rounds):
+            for biti in range(WS):
+                if biti not in bits_to_guess[r]:
+                    krguesses[r][biti] = randint(0,1)
+                    
         out1 = simon(pair[0],keys,rounds)
         left1, right1 = split(out1)
         out2 = simon(pair[1],keys,rounds)
         left2, right2 = split(out2)
 
         for k in krguesses[::-1]:
-            left1,right1,left2,right2 = backtrack(left1,right1,left2,right2,k)
+            left1,right1,left2,right2 = backtrack(left1,right1,left2,right2,convert(k))
         
         if enddiff[0] == left1 ^ left2 and enddiff[1] == right1 ^ right2:
             d[str(kguesses)]+=1
 
-#print("d",d)
 m = -1
 mc = 0
 for x in d.keys():

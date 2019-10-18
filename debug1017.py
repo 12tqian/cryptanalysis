@@ -1,3 +1,4 @@
+#Used for debugging. Now obsolete.
 from util import *
 from simon import *
 from random import randint
@@ -106,8 +107,6 @@ for kguesses in [[0, 32770, 40971],[0, 2, 40971]]:
             print(pair,kguesses)
             input()
             
-
-#print("d",d)
 m = -1
 mc = 0
 for x in d.keys():

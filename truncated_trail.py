@@ -1,10 +1,14 @@
 from util import *
-lac = [[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0]]    #left  bits
+#lac = [[0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0]]    #left  bits
 
-rac = [[0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]]
+#rac = [[0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0]]
+lac = [[0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0]]    #left  bits
+
+rac = [[0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0]]
+
 kib = []    #Which bits in the keys are important
 rounds = 4  #How many rounds do you trace
-sr = 2 #start round (for display purposes)
+sr = 5 #start round (for display purposes)
 
 #0 is inactive
 #1 is active
