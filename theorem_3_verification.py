@@ -37,7 +37,7 @@ for i in range((1<<MX)):
     w = wt(i)
     if(prob(i) == -1):
         print(i)
-    #st[w].append(prob(i))
+    st[w].append(prob(i))
 for i in range(len(st)):
     st[i].sort()
 print(st)
