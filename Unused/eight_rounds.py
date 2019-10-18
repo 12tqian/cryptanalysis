@@ -1,5 +1,6 @@
 from util import *
 from simon import *
+from truncated_trail import *
 from random import randint
 
 
@@ -20,28 +21,32 @@ def color_match(diff, expected):
             return False
     return True
 
-#try to break 8 rounds
-#At round 1, diff is (0, d{6})
-startdiff = [0,convert([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0])]   #Dependent
-
-#At round 5, diff is (d{8},d{6})
-enddiff = [convert([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]),convert([0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0])] #Dependent
-
-leftdiff = [2,2,1,2,2,0,2,2,2,2,2,0,2,2,2,2] #At rounds rounds, diff is this    #Dependent
-rightdiff = [2,2,0,2,2,0,0,1,2,2,2,0,0,2,0,1]   #Dependent
-
-NC = 1000 #Number of pair candidates
+################ The code in this block determines which cipher it breaks.
 rounds = 8 #Total rounds    #Dependent
 extra_rounds = 3#Dependent
 
-keys = [rand_word() for x in range(rounds)]#
+#try to break 8 rounds
+#At round 1, diff is (0, d{6})
+trail_start_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]   #Dependent
+
+#At round 5, diff is (d{12},d{6,10})
+trail_end_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0])] #Dependent
+################
+
+end_diff = [[],[]]
+end_diff[0], end_diff[1], bits_to_guess = trail_info(trail_end_diff, extra_rounds, rounds-extra_rounds)
+#bits_to_guess: Should have a length of extra_rounds, first list should be empty
+
+NC = 100 #Number of pair candidates
+
+keys = [rand_word() for x in range(rounds)]
 print("keys",keys)
 
 #Generate a bunch of pair candidates and filter them
 filtered = []
 while len(filtered) < NC:
     left1, right1 = rand_word(), rand_word()
-    left2, right2 = left1^startdiff[1], right1^f(left1^startdiff[1])^f(left1)^startdiff[0] #modified to extract an extra round.
+    left2, right2 = left1^trail_start_diff[1], right1^f(left1^trail_start_diff[1])^f(left1)^trail_start_diff[0] #modified to extract an extra round.
     pair = [compose(left1,right1),compose(left2,right2)]
 
     out1 = simon(pair[0],keys,rounds)
@@ -50,10 +55,9 @@ while len(filtered) < NC:
     outleft2, outright2 = split(out2)
 
     #check if the pair matches expected after rounds rounds
-    if color_match(outleft1^outleft2,leftdiff) and color_match(outright1^outright2,rightdiff):
+    if color_match(outleft1^outleft2,end_diff[0]) and color_match(outright1^outright2,end_diff[1]):
         filtered.append(pair) #Pair has correct output
 
-bits_to_guess = [[],[3,5],[1,3,4,5,6,7,11,13,15]] #Should have a length of extra_rounds, first list should be empty #Dependent
 print("filtered",len(filtered))
 d = {}  #Maps key guesses to number of correct matches
 for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))): #Iterates through all configurations of important bits
@@ -74,12 +78,12 @@ for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))): 
     d[str(kguesses)] = 0
 
     for pair in filtered:
-        """
+        
         for r in range(extra_rounds):
             for biti in range(WS):
                 if biti not in bits_to_guess[r]:
                     krguesses[r][biti] = randint(0,1)   #Redo the randomness for unimportant key bits
-        """
+        
 
         #Get final output from oracle
         out1 = simon(pair[0],keys,rounds)   
@@ -92,7 +96,7 @@ for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))): 
             left1,right1,left2,right2 = backtrack(left1,right1,left2,right2,convert(k))
 
         #See if it's a correct match
-        if enddiff[0] == left1 ^ left2 and enddiff[1] == right1 ^ right2:
+        if trail_end_diff[0] == left1 ^ left2 and trail_end_diff[1] == right1 ^ right2:
             d[str(kguesses)]+=1
 
 #Find largest dictionary element
