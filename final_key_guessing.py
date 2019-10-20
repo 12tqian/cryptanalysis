@@ -32,22 +32,46 @@ def color_match(diff, expected):
 ##trail_end_diff = [convert([0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]
 ##################
 
+################## The code in this block determines which cipher it breaks.
+##rounds = 8 #Total rounds
+##extra_rounds = 3#Rounds you backtrack
+##
+###At round 1
+##trail_start_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]   #Put in standard form
+##
+###At round (rounds-extra_rounds)
+##trail_end_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0])]
+##################
+
+################## The code in this block determines which cipher it breaks.
+##rounds = 17 #Total rounds
+##extra_rounds = 3#Rounds you backtrack
+##
+###At round 1
+##trail_start_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]   #Put in standard form
+##
+###At round (rounds-extra_rounds)
+##trail_end_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]),convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])]
+##################
+
 ################ The code in this block determines which cipher it breaks.
-rounds = 8 #Total rounds
+#WS = 24
+rounds = 12 #Total rounds
 extra_rounds = 3#Rounds you backtrack
 
 #At round 1
-trail_start_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]   #Put in standard form
+trail_start_diff = [convert([x in [8,16] for x in range(WS)]),convert([x in [6,14,18] for x in range(WS)])]   #Put in standard form
 
 #At round (rounds-extra_rounds)
-trail_end_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0])]
+trail_end_diff = [convert([x in [8] for x in range(WS)]),convert([x in [6] for x in range(WS)])]
 ################
 
-end_diff = [[],[]]
-end_diff[0], end_diff[1], bits_to_guess = trail_info(trail_end_diff, extra_rounds, rounds-extra_rounds)
+slr_diff = [[],[]]  #Differential (with 0's, 1's, 2's) expected at round (round-1) AKA second to last round. Compared with last round inverted.
+slr_diff[0], slr_diff[1], bits_to_guess = trail_info(trail_end_diff, extra_rounds, rounds-extra_rounds)
 #bits_to_guess: Should have a length of extra_rounds, first list should be empty
 
-NC = 50 #Number of pair candidates
+NC = 100 #Number of pair candidates
+gonethrough = 0
 
 keys = [rand_word() for x in range(rounds)]
 print("keys",keys)
@@ -55,6 +79,7 @@ print("keys",keys)
 #Generate a bunch of pair candidates and filter them
 filtered = []
 while len(filtered) < NC:
+    gonethrough+=1
     left1, right1 = rand_word(), rand_word()
     left2, right2 = left1^trail_start_diff[1], right1^f(left1^trail_start_diff[1])^f(left1)^trail_start_diff[0] #modified to extract an extra round.
     pair = [compose(left1,right1),compose(left2,right2)]
@@ -64,8 +89,13 @@ while len(filtered) < NC:
     out2 = simon(pair[1],keys,rounds)
     outleft2, outright2 = split(out2)
 
+    #Invert last round
+    slrdiffleft = (outright1^outright2) #Second to last round diff
+    slrdiffright = (outleft1^f(outright1))^(outleft2^f(outright2))
+
+
     #check if the pair matches expected after rounds rounds
-    if color_match(outleft1^outleft2,end_diff[0]) and color_match(outright1^outright2,end_diff[1]):
+    if color_match(slrdiffleft,slr_diff[0]) and color_match(slrdiffright,slr_diff[1]):
         filtered.append(pair) #Pair has correct output
 
 print("filtered",len(filtered))

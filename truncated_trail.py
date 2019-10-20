@@ -49,8 +49,8 @@ def trail_info(diff, extra_rounds, sr=0, disp=False):
         for b in range(WS):
             if key[b] == 1:
                 bits_to_guess[-1].append(b)
-    return lac[-1], rac[-1], bits_to_guess
+    return lac[-2], rac[-2], bits_to_guess
 
 if __name__ == "__main__":
-    diff = [convert([0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0]),convert([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0])]
-    trail_info(diff, 3, 6, True)
+    diff = [convert([x in [8] for x in range(WS)]),convert([x in [6] for x in range(WS)])]
+    trail_info(diff, 3, 9, True)
