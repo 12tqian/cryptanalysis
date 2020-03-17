@@ -23,7 +23,7 @@ def trail_info(diff, extra_rounds, sr=0, disp=False):
                 lac[-1][(b+1)%WS] = 2
                 lac[-1][(b+8)%WS] = 2
                 if lac[-1][(b+2)%WS] == 0:
-                    lac[-1][(b+2)%WS] = 1
+                    lac[-1][(b+2)%WS] = max(1, lac[-1][(b+2)%WS])
                 else:
                     lac[-1][(b+2)%WS] = 2
             elif rac[-1][b] == 2:

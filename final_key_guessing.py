@@ -2,6 +2,7 @@ from util import *
 from simon import *
 from truncated_trail import *
 from random import randint
+import time
 
 
 def rand_word(size = WS):
@@ -21,159 +22,129 @@ def color_match(diff, expected):
             return False
     return True
 
-################## The code in this block determines which cipher it breaks.
-##rounds = 6 #Total rounds
-##extra_rounds = 3#Rounds you backtrack
-##
-###At round 1
-##trail_start_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]   #Put in standard form
-##
-###At round (rounds-extra_rounds)
-##trail_end_diff = [convert([0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]
-##################
 
-################## The code in this block determines which cipher it breaks.
-##rounds = 8 #Total rounds
-##extra_rounds = 3#Rounds you backtrack
-##
-###At round 1
-##trail_start_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]   #Put in standard form
-##
-###At round (rounds-extra_rounds)
-##trail_end_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0])]
-##################
+def diff_crypt(rounds, extra_rounds, trail_start_diff, trail_end_diff, num_pairs=100, disp=True):
+    slr_diff = [[],[]]  #Differential (with 0's, 1's, 2's) expected at round (round-1) AKA second to last round. Compared with last round inverted.
+    slr_diff[0], slr_diff[1], bits_to_guess = trail_info(trail_end_diff, extra_rounds, rounds-extra_rounds)
+    #bits_to_guess: Should have a length of extra_rounds, first list should be empty
 
-################## The code in this block determines which cipher it breaks.
-##rounds = 17 #Total rounds
-##extra_rounds = 3#Rounds you backtrack
-##
-###At round 1
-##trail_start_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]),convert([0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0])]   #Put in standard form
-##
-###At round (rounds-extra_rounds)
-##trail_end_diff = [convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0]),convert([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])]
-##################
+    NC = num_pairs #Number of pair candidates
+    gonethrough = 0
 
-################ The code in this block determines which cipher it breaks.
-#WS = 24
-rounds = 12 #Total rounds
-extra_rounds = 3#Rounds you backtrack
+    keys = [rand_word() for x in range(rounds)]
+    if disp:
+        print("keys",keys)
 
-#At round 1
-trail_start_diff = [convert([x in [8,16] for x in range(WS)]),convert([x in [6,14,18] for x in range(WS)])]   #Put in standard form
+    #Generate a bunch of pair candidates and filter them
+    filtered = []
+    while len(filtered) < NC:
+        gonethrough+=1
+        left1, right1 = rand_word(), rand_word()
+        left2, right2 = left1^trail_start_diff[1], right1^f(left1^trail_start_diff[1])^f(left1)^trail_start_diff[0] #modified to extract an extra round.
+        pair = [compose(left1,right1),compose(left2,right2)]
 
-#At round (rounds-extra_rounds)
-trail_end_diff = [convert([x in [8] for x in range(WS)]),convert([x in [6] for x in range(WS)])]
-################
-
-slr_diff = [[],[]]  #Differential (with 0's, 1's, 2's) expected at round (round-1) AKA second to last round. Compared with last round inverted.
-slr_diff[0], slr_diff[1], bits_to_guess = trail_info(trail_end_diff, extra_rounds, rounds-extra_rounds)
-#bits_to_guess: Should have a length of extra_rounds, first list should be empty
-
-NC = 100 #Number of pair candidates
-gonethrough = 0
-
-keys = [rand_word() for x in range(rounds)]
-print("keys",keys)
-
-#Generate a bunch of pair candidates and filter them
-filtered = []
-while len(filtered) < NC:
-    gonethrough+=1
-    left1, right1 = rand_word(), rand_word()
-    left2, right2 = left1^trail_start_diff[1], right1^f(left1^trail_start_diff[1])^f(left1)^trail_start_diff[0] #modified to extract an extra round.
-    pair = [compose(left1,right1),compose(left2,right2)]
-
-    out1 = simon(pair[0],keys,rounds)
-    outleft1, outright1 = split(out1)
-    out2 = simon(pair[1],keys,rounds)
-    outleft2, outright2 = split(out2)
-
-    #Invert last round
-    slrdiffleft = (outright1^outright2) #Second to last round diff
-    slrdiffright = (outleft1^f(outright1))^(outleft2^f(outright2))
-
-
-    #check if the pair matches expected after rounds rounds
-    if color_match(slrdiffleft,slr_diff[0]) and color_match(slrdiffright,slr_diff[1]):
-        filtered.append(pair) #Pair has correct output
-
-print("filtered",len(filtered))
-d = {}  #Maps key guesses to number of correct matches
-for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))): #Iterates through all configurations of important bits
-    
-    kguesses = []   #In order of increasing round numbers. Used soley as a key in map. Elements are integers
-    krguesses=[] #kguesses, but random bits in unimportant slots. Used in the actual backtracking. Elements are lists of bits
-    index = 0 #Index of bit in guess we are currently using
-    for r in range(extra_rounds):
-        kr = [randint(0,1) for x in range(WS)]  #Randomness
-        k = [0]*WS
-        for biti in range(len(bits_to_guess[r])):
-            k[bits_to_guess[r][biti]] = get(guess,index)
-            kr[bits_to_guess[r][biti]] = get(guess,index)
-            index+=1
-        k = convert(k)
-        kguesses.append(k)
-        krguesses.append(kr)
-    d[str(kguesses)] = 0
-
-    for pair in filtered:
-        
-        for r in range(extra_rounds):
-            for biti in range(WS):
-                if biti not in bits_to_guess[r]:
-                    krguesses[r][biti] = randint(0,1)   #Redo the randomness for unimportant key bits
-        
-
-        #Get final output from oracle
-        out1 = simon(pair[0],keys,rounds)   
-        left1, right1 = split(out1)
+        out1 = simon(pair[0],keys,rounds)
+        outleft1, outright1 = split(out1)
         out2 = simon(pair[1],keys,rounds)
-        left2, right2 = split(out2)
+        outleft2, outright2 = split(out2)
 
-        #Backtrack to end of trail
-        for k in krguesses[::-1]:
-            left1,right1,left2,right2 = backtrack(left1,right1,left2,right2,convert(k))
+        #Invert last round
+        slrdiffleft = (outright1^outright2) #Second to last round diff
+        slrdiffright = (outleft1^f(outright1))^(outleft2^f(outright2))
 
-        #See if it's a correct match
-        if trail_end_diff[0] == left1 ^ left2 and trail_end_diff[1] == right1 ^ right2:
-            d[str(kguesses)]+=1
 
-#Find largest dictionary element
-m = -1
-mc = 0
-for x in d.keys():
-    if d[x] > mc:
-        m = x
-        mc = d[x]
-m = [int(x) for x in m[1:-1].split(", ")]
+        #check if the pair matches expected after rounds rounds
+        if color_match(slrdiffleft,slr_diff[0]) and color_match(slrdiffright,slr_diff[1]):
+            filtered.append(pair) #Pair has correct output
 
-#print result
-belief = ""
-print("Believes that: ")
-for r in range(extra_rounds):
-    ri = rounds-extra_rounds+r#Adjusted
-    for biti in range(len(bits_to_guess[r])):
-        print("Round",ri,"bit",bits_to_guess[r][biti],"is",get(m[r],bits_to_guess[r][biti]))
-        belief += str(get(m[r],bits_to_guess[r][biti]))
-
-#print answer
-answer = ""
-print("Answer: ")
-for r in range(extra_rounds):
-    ri = rounds-extra_rounds+r
-    for biti in range(len(bits_to_guess[r])):
-        print("Round",ri,"bit",bits_to_guess[r][biti],"is",get(keys[ri],bits_to_guess[r][biti]))
-        answer += str(get(keys[ri],bits_to_guess[r][biti]))
+    if disp:
+        print("filtered",len(filtered))
+    d = {}  #Maps key guesses to number of correct matches
+    for guess in range(2**sum(len(bits_to_guess[r]) for r in range(extra_rounds))): #Iterates through all configurations of important bits
         
-print(answer==belief)   #Did it work?
+        kguesses = []   #In order of increasing round numbers. Used soley as a key in map. Elements are integers
+        krguesses=[] #kguesses, but random bits in unimportant slots. Used in the actual backtracking. Elements are lists of bits
+        index = 0 #Index of bit in guess we are currently using
+        for r in range(extra_rounds):
+            kr = [randint(0,1) for x in range(WS)]  #Randomness
+            k = [0]*WS
+            for biti in range(len(bits_to_guess[r])):
+                k[bits_to_guess[r][biti]] = get(guess,index)
+                kr[bits_to_guess[r][biti]] = get(guess,index)
+                index+=1
+            k = convert(k)
+            kguesses.append(k)
+            krguesses.append(kr)
+        d[str(kguesses)] = 0
 
-#Find runner up
-mc = 0
-m_runnerup = -1
-for x in d.keys():
-    if d[x] > mc and x != str(m):
-        m_runnerup = x
-        mc = d[x]
-print("Winner:",m,d[str(m)])
-print("Runner up:", m_runnerup, d[m_runnerup])
+        for pair in filtered:
+            
+            for r in range(extra_rounds):
+                for biti in range(WS):
+                    if biti not in bits_to_guess[r]:
+                        krguesses[r][biti] = randint(0,1)   #Redo the randomness for unimportant key bits
+            
+
+            #Get final output from oracle
+            out1 = simon(pair[0],keys,rounds)   
+            left1, right1 = split(out1)
+            out2 = simon(pair[1],keys,rounds)
+            left2, right2 = split(out2)
+
+            #Backtrack to end of trail
+            for k in krguesses[::-1]:
+                left1,right1,left2,right2 = backtrack(left1,right1,left2,right2,convert(k))
+
+            #See if it's a correct match
+            if trail_end_diff[0] == left1 ^ left2 and trail_end_diff[1] == right1 ^ right2:
+                d[str(kguesses)]+=1
+
+    #Find largest dictionary element
+    m = -1
+    mc = 0
+    for x in d.keys():
+        if d[x] > mc:
+            m = x
+            mc = d[x]
+    m = [int(x) for x in m[1:-1].split(", ")]
+
+    
+    #print result
+    belief = ""
+    if disp:
+        print("Believes that: ")
+    for r in range(extra_rounds):
+        ri = rounds-extra_rounds+r#Adjusted
+        for biti in range(len(bits_to_guess[r])):
+            if disp:
+                print("Round",ri,"bit",bits_to_guess[r][biti],"is",get(m[r],bits_to_guess[r][biti]))
+            belief += str(get(m[r],bits_to_guess[r][biti]))
+
+    #print answer
+    answer = ""
+
+    if disp:
+        print("Answer: ")
+    for r in range(extra_rounds):
+        ri = rounds-extra_rounds+r
+        for biti in range(len(bits_to_guess[r])):
+
+            if disp:
+                print("Round",ri,"bit",bits_to_guess[r][biti],"is",get(keys[ri],bits_to_guess[r][biti]))
+            answer += str(get(keys[ri],bits_to_guess[r][biti]))
+
+    #Find runner up
+    mc = 0
+    m_runnerup = -1
+    for x in d.keys():
+        if d[x] > mc and x != str(m):
+            m_runnerup = x
+            mc = d[x]
+
+    if disp:
+        print("Winner:",m,d[str(m)])
+        print("Runner up:", m_runnerup, d[m_runnerup])
+    
+
+        print(answer==belief)   #Did it work?
+    return answer==belief
